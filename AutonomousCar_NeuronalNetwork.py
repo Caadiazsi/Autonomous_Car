@@ -5,8 +5,8 @@ py.init()
 print("Hello Cruel World...")
 
 #CAR SETTINGS
-INIT_X = 48
-INIT_Y = 48
+INIT_X = 64
+INIT_Y = 64
 WIDTH = 32
 HEIGHT = 32
 vel = 5
@@ -18,9 +18,11 @@ RED = (255,0,0)
 GREEN = (0,255,0) 
 BLUE = (0,0,255)
 WHITE = (255,255,255)
-colide_markers = ((0,0),(0,0),(0,0),(0,0),(0,0))
+PURPLE = (102,0,102)
+LIGHTBLUE = (153,255,255)
+colide_markers = [1,1,1,1,1]
 COL_MULTI = (2,1,0,-1,-2)
-COLIDE_CIRCLES_RADIUS = 5
+COLIDE_CIRCLES_RADIUS = 3
 #WINDOW SETTINGS
 WIN_WIDTH = 768
 WIN_HEIGHT = 768
@@ -28,7 +30,7 @@ WIN = py.display.set_mode((WIN_WIDTH,WIN_HEIGHT))
 py.display.set_caption("Autonomous_Car")
 FPS = 30
 CLOCK = py.time.Clock()
-TILESIZE = 32
+TILESIZE = 16
 GRIDWIDTH = WIN_WIDTH / TILESIZE
 GRIDHEIGHT = WIN_HEIGHT / TILESIZE
 
@@ -53,10 +55,31 @@ while loop:
 		py.draw.line(WIN, LIGHTGREY, (x_grid,0),(x_grid, WIN_HEIGHT))
 	for y_grid in range ( 0, WIN_HEIGHT, TILESIZE):
 		py.draw.line(WIN, LIGHTGREY, (0,y_grid), ( WIN_WIDTH, y_grid))
+	#BORDERS
+	py.draw.rect(WIN, PURPLE, py.Rect(0,0,(GRIDWIDTH)*TILESIZE,TILESIZE))
+	py.draw.rect(WIN, PURPLE, py.Rect(0,TILESIZE,TILESIZE,(GRIDHEIGHT-1)*TILESIZE))
+	py.draw.rect(WIN, PURPLE, py.Rect((GRIDWIDTH-1)*TILESIZE,TILESIZE,TILESIZE,(GRIDHEIGHT-1)*TILESIZE))
+	py.draw.rect(WIN, PURPLE, py.Rect(TILESIZE,(GRIDHEIGHT-1)*TILESIZE,(GRIDWIDTH-2)*TILESIZE,TILESIZE))
 	#DRAW_COLIDE_MARKERS
 	for colide_mar in range(0,5):
 		temp_rot = math.radians(rot+(COL_MULTI[colide_mar]*45))
-		py.draw.circle(WIN, GREEN, (int(old_center[0] + (TILESIZE * 1.5 * math.sin(temp_rot))) ,int(old_center[1] + (TILESIZE * 1.5 * math.cos(temp_rot)))), COLIDE_CIRCLES_RADIUS)
+		temp = 17
+		while (temp<48):
+			temp_X = int(old_center[0] + (temp * math.sin(temp_rot)))
+			temp_Y = int(old_center[1] + (temp * math.cos(temp_rot)))
+			if(WIN.get_at((temp_X,temp_Y))) == PURPLE:
+				colide_markers[colide_mar] = 0
+				if(temp==17):
+					old_center = (INIT_X,INIT_Y)
+					rot = 0
+				break
+			else:
+				colide_markers[colide_mar] = 1
+				temp+=1
+		if colide_markers[colide_mar] == 0:
+			py.draw.circle(WIN, RED, ( temp_X, temp_Y), COLIDE_CIRCLES_RADIUS)
+		else:
+			py.draw.circle(WIN, GREEN, ( temp_X, temp_Y), COLIDE_CIRCLES_RADIUS)
 	#CLOSE_WINDOW
 	for event in py.event.get():
 		if event.type == py.QUIT:
