@@ -21,6 +21,7 @@ WHITE = (255,255,255)
 PURPLE = (102,0,102)
 LIGHTBLUE = (153,255,255)
 colide_markers = [1,1,1,1,1]
+colide_distances = [48,48,48,48,48]
 COL_MULTI = (2,1,0,-1,-2)
 COLIDE_CIRCLES_RADIUS = 3
 #WINDOW SETTINGS
@@ -64,7 +65,7 @@ while loop:
 	for colide_mar in range(0,5):
 		temp_rot = math.radians(rot+(COL_MULTI[colide_mar]*45))
 		temp = 17
-		while (temp<48):
+		while (temp<49):
 			temp_X = int(old_center[0] + (temp * math.sin(temp_rot)))
 			temp_Y = int(old_center[1] + (temp * math.cos(temp_rot)))
 			if(WIN.get_at((temp_X,temp_Y))) == PURPLE:
@@ -72,6 +73,7 @@ while loop:
 				if(temp==17):
 					old_center = (INIT_X,INIT_Y)
 					rot = 0
+				colide_distances[colide_mar] = temp
 				break
 			else:
 				colide_markers[colide_mar] = 1
@@ -93,11 +95,10 @@ while loop:
 	if keys[py.K_LEFT]:
 		rot = (rot+rot_speed)%360 
 	if keys[py.K_RIGHT]:
-		rot = (rot-rot_speed)%360 
-	#GOFORWARD
-	if keys[py.K_UP]:
-		rot_radians = math.radians(rot)
-		old_center = (old_center[0] + (vel * math.sin(rot_radians)),old_center[1] + (vel * math.cos(rot_radians)))
+		rot = (rot-rot_speed)%360
+		
+	rot_radians = math.radians(rot)
+	old_center = (old_center[0] + (vel * math.sin(rot_radians)),old_center[1] + (vel * math.cos(rot_radians)))
 	#UPDATE CAR
 	new_image = py.transform.rotate(image_car, rot)
 	rect = new_image.get_rect()
