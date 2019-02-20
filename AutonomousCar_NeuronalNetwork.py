@@ -14,7 +14,7 @@ WIDTH = 16
 HEIGHT = 16
 vel = 4
 rot = 0
-rot_speed = 6
+rot_speed = 10
 
 #COLORS
 BLACK = (0,0,0)
@@ -85,8 +85,8 @@ while loop:
 	#DRAW_AND_CHECK_COLIDE_MARKERS
 	for colide_mar in range(0,5):
 		temp_rot = math.radians(rot+(COL_MULTI[colide_mar]*45))
-		temp = 17
-		while (temp<49):
+		temp = 9
+		while (temp<33):
 			temp_X = int(old_center[0] + (temp * math.sin(temp_rot)))
 			temp_Y = int(old_center[1] + (temp * math.cos(temp_rot)))
 			if(WIN.get_at((temp_X,temp_Y))) == LIGHTYELLOW and temp<20:
@@ -96,7 +96,7 @@ while loop:
 				rot = 0
 			elif(WIN.get_at((temp_X,temp_Y))) == PURPLE:
 				colide_markers[colide_mar] = 0
-				if(temp==17):
+				if(temp==9):
 					old_center = (INIT_X,INIT_Y)
 					rot = 0
 				colide_distances[colide_mar] = temp
