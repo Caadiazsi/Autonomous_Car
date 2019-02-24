@@ -1,6 +1,6 @@
 import pygame as py
 import math
-from NeuralNetwork import NeuralNetwork
+from NeuralNetwork import DeepQLearning
 
 def draw_grid(window, width,height,tilesize,color):
     for x_grid in range( 0, width+1, tilesize):
@@ -98,11 +98,7 @@ def main():
     rect = image_copy.get_rect()
     rect.center = (INIT_X,INIT_Y)
     #NEURAL NETWORKS
-    Network = NeuralNetwork(no_of_in_nodes=6,
-                                   no_of_out_nodes=3,
-                                   no_of_hidden_nodes=30,
-                                   learning_rate=0.1,
-                                   bias=None)
+    Network = DeepQLearning()
     loop = True
     while loop:
         CLOCK.tick(FPS)
@@ -118,7 +114,11 @@ def main():
         #CHECK_COLIDE_MARKERS
         collide_sensors, collide_distances = check_collide_distances(WIN, old_center, rot, PURPLE, COLL_MULTI)
         ############################MADE A DECISION#########################################
-        action = 0
+        action = Network.actuar(collide_sensors)   #0-Seguir derecho. 1-Girar Not-Clockwise. 2-Girar Clockwise
+        if action == 1:
+            rot = rot - rot_speed
+        elif action == 2:
+            rot = rot + rot_speed
         #MOVE CAR
         old_center, rot = movement(rect.center, vel, rot, rot_speed, action)
         #DRAW_SENSORS

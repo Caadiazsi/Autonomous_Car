@@ -18,7 +18,7 @@ class DeepQLearning():
         model.add(Dense(24, input_dim=1, activation='relu'))
         model.add(Dense(24, activation='relu'))
         model.add(Dense(24, activation='relu'))
-        model.add(Dense(2, activation='linear'))
+        model.add(Dense(3, activation='linear'))
         model.compile(loss='mse', optimizer=Adam())
         return model
 
