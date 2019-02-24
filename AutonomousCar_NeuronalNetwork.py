@@ -115,10 +115,7 @@ def main():
         collide_sensors, collide_distances = check_collide_distances(WIN, old_center, rot, PURPLE, COLL_MULTI)
         ############################MADE A DECISION#########################################
         action = Network.actuar(collide_sensors)   #0-Seguir derecho. 1-Girar Not-Clockwise. 2-Girar Clockwise
-        if action == 1:
-            rot = rot - rot_speed
-        elif action == 2:
-            rot = rot + rot_speed
+        print(action)
         #MOVE CAR
         old_center, rot = movement(rect.center, vel, rot, rot_speed, action)
         #DRAW_SENSORS
