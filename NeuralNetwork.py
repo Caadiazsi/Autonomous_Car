@@ -26,7 +26,7 @@ class DeepQLearning():
         self.memory.append((estado, accion, recompensa, siguienteEstado, final))
 
     def aprender(self):
-        if(len(self.memory))>200:
+        if len(self.memory) < 200:
             for estado, accion, recompensa, siguienteEstado, final in self.memory:
                 target = recompensa
                 if not final:
@@ -44,10 +44,11 @@ class DeepQLearning():
                            np.amax(self.red.predict(siguienteEstado)[0])
                 target_f = self.red.predict(estado)
                 target_f[0][accion] = target
+                #self.red.train_on_batch (estado, target_f)
                 self.red.fit(estado, target_f, epochs=1, verbose=0)
 
     def actuar(self, state):
         act_values = self.red.predict(state)
         return np.argmax(act_values[0])  # returns action
 
-lolo = DeepQLearning()
+#lolo = DeepQLearning()

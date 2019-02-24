@@ -1,6 +1,14 @@
 import pygame as py
 import math
 from NeuralNetwork import DeepQLearning
+import random
+from Funk import text_to_screen
+
+def flip(p):
+    if random.random() <= p:
+        return "RANDOM" # RANDOM
+    else:
+        return "NETWORK" # NETWORK
 
 def draw_grid(window, width,height,tilesize,color):
     for x_grid in range( 0, width+1, tilesize):
@@ -60,9 +68,28 @@ def movement(center, vel, rot,rot_speed, action):
     new_center = (center[0] + (vel * math.sin(rot_radians)),center[1] + (vel * math.cos(rot_radians)))
     return new_center, rot
 
+def check_reward(old_sensors, new_sensors, old_distances, new_distances):
+    old = 0
+    new = 0
+    for i in range (0,3):
+        if(old_sensors == 0):
+            old = old + old_distances[i]
+        if(new_sensors == 0):
+            old = old + new_distances[i]
+    if old > new:
+        return -1
+    elif new < old:
+        return 1
+    else:
+        return 0
+
 def main():
     py.init()
     print("Hello Cruel World...")
+    iterations = 1
+    temp = 0
+    state = "TRAINING"
+    final = False
     #CAR SETTINGS
     INIT_X,INIT_Y,WIDTH,HEIGHT,vel,rot,rot_speed = 64,32,16,16,4,0,20
     #COLORS
@@ -71,11 +98,13 @@ def main():
     #COLLIDE_STUFF
     collide_sensors = [1,1,1]
     collide_distances = [48,48,48]
+    temp_collide_sensors = [1,1,1]
+    temp_collide_distances = [48,48,48]
     COLL_MULTI = (45,0,-45)
     COLLIDE_CIRCLES_RADIUS = 3
     #WINDOW SETTINGS
     WIN_WIDTH,WIN_HEIGHT,FPS,TILESIZE = 736,736,30,16
-    WIN = py.display.set_mode((WIN_WIDTH,WIN_HEIGHT))
+    WIN = py.display.set_mode((WIN_WIDTH+100,WIN_HEIGHT))
     py.display.set_caption("Autonomous_Car")
     CLOCK = py.time.Clock()
     GRIDWIDTH = WIN_WIDTH / TILESIZE
@@ -99,43 +128,75 @@ def main():
     rect.center = (INIT_X,INIT_Y)
     #NEURAL NETWORKS
     Network = DeepQLearning()
+    epsilon = 1
     loop = True
     while loop:
+        keys = py.key.get_pressed()
+        if keys[py.K_t]:  #TEST
+            temp = epsilon
+            epsilon = 0
+            state = "TESTING"
+        if keys[py.K_p]:
+            epsilon = temp
+            state = "TRAINING"
+        if(iterations%5000==0):
+            print("LETS GO!")
+            iterations = 1
+            epsilon = epsilon -0.1
         CLOCK.tick(FPS)
         WIN.fill(BLACK)
 	    #COPY_CAR_POSITION
         old_center = rect.center
         #DRAW_GRID
-        draw_grid(WIN, WIN_WIDTH,WIN_HEIGHT,TILESIZE,LIGHTGREY)
+        #draw_grid(WIN, WIN_WIDTH,WIN_HEIGHT,TILESIZE,LIGHTGREY)
         #DRAW_WALLS
         draw_walls(WIN,TILESIZE, PURPLE, TRAIN_WALLS)
         #THE_OBJECTIVE
-        py.draw.rect(WIN, LIGHTYELLOW, py.Rect(20*TILESIZE,29*TILESIZE,TILESIZE*3,TILESIZE*3))
+        #py.draw.rect(WIN, LIGHTYELLOW, py.Rect(20*TILESIZE,29*TILESIZE,TILESIZE*3,TILESIZE*3))
         #CHECK_COLIDE_MARKERS
         collide_sensors, collide_distances = check_collide_distances(WIN, old_center, rot, PURPLE, COLL_MULTI)
         ############################MADE A DECISION#########################################
-        action = Network.actuar(collide_sensors)   #0-Seguir derecho. 1-Girar Not-Clockwise. 2-Girar Clockwise
-        print(action)
+        decision = flip(epsilon)
+        if(decision=="RANDOM"):
+            action = random.randint(0,2)
+        elif(decision=="NETWORK"):
+            action = Network.actuar(collide_sensors)   #0-Seguir derecho. 1-Girar Not-Clockwise. 2-Girar Clockwise
+        #print(action)
         #MOVE CAR
         old_center, rot = movement(rect.center, vel, rot, rot_speed, action)
+        temp_collide_sensors, temp_collide_distances = check_collide_distances(WIN, old_center, rot, PURPLE, COLL_MULTI)
         #DRAW_SENSORS
         draw_sensors(WIN, old_center, rot, collide_distances, collide_sensors, COLL_MULTI, COLLIDE_CIRCLES_RADIUS, RED, GREEN)
-        #CHECK COLLISION
+        #CHECK COLLISION AND REWARD
         collision = check_collision(collide_distances, collide_sensors)
-        ##########################################CHECK REWARD########################################################
-        last_reward = 0
-        ######################################UPDATE NETWORK""""""""""""""""""""""""""
+        if collision:
+            old_center = (INIT_X,INIT_Y)
+            rot = 0
+            last_reward = -100
+            final = True
+        else:
+            last_reward = check_reward(collide_sensors, temp_collide_sensors, collide_distances, temp_collide_distances)
+            final = False
+        #UPDATE NETWORK
+        Network.recordar(collide_distances, action, last_reward, temp_collide_distances, final)
+        if state == "TRAINING":
+            Network.aprender()
         #UPDATE CAR (RECT)
         new_image = py.transform.rotate(image_car, rot)
         rect = new_image.get_rect()
         rect.center = old_center
         WIN.blit(new_image,rect)
+        text_to_screen(WIN, 'Text {0}'.format(epsilon), 750, 20)
+        text_to_screen(WIN, 'Text {0}'.format(iterations), 750, 80)
+        text_to_screen(WIN, state, 750, 140)
+
         #CLOSE_WINDOW
         for event in py.event.get():
             if event.type == py.QUIT:
                 loop = False
         py.display.flip()
         py.display.update()
+        iterations += 1
     print("See You, Cruel World!")
     py.quit()
 
