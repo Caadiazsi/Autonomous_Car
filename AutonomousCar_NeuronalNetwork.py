@@ -98,7 +98,7 @@ def main():
     final = False
     iper = 200
     #CAR SETTINGS
-    INIT_X,INIT_Y,WIDTH,HEIGHT,vel,rot,rot_speed, sensor_distance = 64,32,16,16,6,0,20,45
+    INIT_X,INIT_Y,WIDTH,HEIGHT,vel,rot,rot_speed, sensor_distance, show_sensors = 64,32,16,16,6,0,20,45,True
     #COLORS
     BLACK,LIGHTGREY,RED,GREEN,BLUE = (0,0,0),(100,100,100),(255,0,0),(0,255,0),(0,0,255)
     WHITE,PURPLE,LIGHTBLUE,LIGHTYELLOW = (255,255,255),(102,0,102),(153,255,255),(248,252,158)
@@ -139,6 +139,8 @@ def main():
     loop = True
     while loop:
         keys = py.key.get_pressed()
+        if keys[py.K_h]:
+            show_sensors = not show_sensors
         if keys[py.K_s]:
             state = "TRAINING"
         if keys[py.K_c]:
@@ -187,7 +189,8 @@ def main():
             old_center, rot = movement(rect.center, vel, rot, rot_speed, action)
             temp_collide_sensors, temp_collide_distances = check_collide_distances(WIN, old_center, rot, PURPLE, COLL_MULTI, sensor_distance)
             #DRAW_SENSORS
-            draw_sensors(WIN, old_center, rot, collide_distances, collide_sensors, COLL_MULTI, COLLIDE_CIRCLES_RADIUS, RED, GREEN)
+            if(show_sensors):
+                draw_sensors(WIN, old_center, rot, collide_distances, collide_sensors, COLL_MULTI, COLLIDE_CIRCLES_RADIUS, RED, GREEN)
             #CHECK COLLISION AND REWARD --- UPDATE NETWORK
             collision = check_collision(collide_distances, collide_sensors)
             if collision:
