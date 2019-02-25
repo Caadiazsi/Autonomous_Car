@@ -52,3 +52,4 @@ class DeepQLearning():
         return np.argmax(act_values[0])  # returns action
 
 #lolo = DeepQLearning()
+#C:\Users\Camilo\AppData\Local\Temp\CUDA

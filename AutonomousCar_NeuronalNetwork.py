@@ -69,6 +69,7 @@ def movement(center, vel, rot,rot_speed, action):
     return new_center, rot
 
 def check_reward(old_sensors, new_sensors, old_distances, new_distances):
+    ##MEJORAR: CUANDO SE MANTIENE DAR REWARD. DAR MAS REWARD AL ALEJARSE Y QUITAR MUCHO AL ACERCARSE
     old = 0
     new = 0
     for i in range (0,3):
@@ -77,11 +78,11 @@ def check_reward(old_sensors, new_sensors, old_distances, new_distances):
         if(new_sensors == 0):
             old = old + new_distances[i]
     if old > new:
-        return -1
+        return -50
     elif new < old:
-        return 1
+        return 100
     else:
-        return 0
+        return 50
 
 def main():
     py.init()
@@ -174,20 +175,20 @@ def main():
             rot = 0
             last_reward = -100
             final = True
+            Network.recordar(collide_distances, action, last_reward, temp_collide_distances, final)
+            if state == "TRAINING":
+                Network.aprender()
         else:
             last_reward = check_reward(collide_sensors, temp_collide_sensors, collide_distances, temp_collide_distances)
             final = False
-        #UPDATE NETWORK
-        Network.recordar(collide_distances, action, last_reward, temp_collide_distances, final)
-        if state == "TRAINING":
-            Network.aprender()
+            Network.recordar(collide_distances, action, last_reward, temp_collide_distances, final)
         #UPDATE CAR (RECT)
         new_image = py.transform.rotate(image_car, rot)
         rect = new_image.get_rect()
         rect.center = old_center
         WIN.blit(new_image,rect)
-        text_to_screen(WIN, 'Text {0}'.format(epsilon), 750, 20)
-        text_to_screen(WIN, 'Text {0}'.format(iterations), 750, 80)
+        text_to_screen(WIN, epsilon, 750, 20)
+        text_to_screen(WIN, iterations, 750, 80)
         text_to_screen(WIN, state, 750, 140)
 
         #CLOSE_WINDOW
