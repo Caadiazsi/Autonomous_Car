@@ -92,7 +92,7 @@ def main():
     state = "TRAINING"
     final = False
     #CAR SETTINGS
-    INIT_X,INIT_Y,WIDTH,HEIGHT,vel,rot,rot_speed = 64,32,16,16,4,0,20
+    INIT_X,INIT_Y,WIDTH,HEIGHT,vel,rot,rot_speed = 64,32,16,16,7,0,20
     #COLORS
     BLACK,LIGHTGREY,RED,GREEN,BLUE = (0,0,0),(100,100,100),(255,0,0),(0,255,0),(0,0,255)
     WHITE,PURPLE,LIGHTBLUE,LIGHTYELLOW = (255,255,255),(102,0,102),(153,255,255),(248,252,158)
@@ -173,7 +173,7 @@ def main():
         if collision:
             old_center = (INIT_X,INIT_Y)
             rot = 0
-            last_reward = -100
+            last_reward = -1000
             final = True
             Network.recordar(collide_distances, action, last_reward, temp_collide_distances, final)
             if state == "TRAINING":
