@@ -4,6 +4,7 @@ import random
 from keras.models import Sequential
 from keras.layers import Dense, Activation
 from keras.optimizers import Adam
+from keras.models import load_model
 
 class DeepQLearning():
 
@@ -61,8 +62,14 @@ class DeepQLearning():
     def actuar(self, state):
         state = np.array([[state[0], state[1], state[2]]])
         act_values = self.red.predict(state)
-        print(act_values)
         return np.argmax(act_values[0])  # returns action
 
+    def guardar(self):
+        print("GUARDANDO MODELO")
+        self.red.save('my_model.h5')
+
+    def cargar(self):
+        print("CARGANDO MODELO")
+        self.red = load_model('my_model.h5')
 #lolo = DeepQLearning()
 #C:\Users\Camilo\AppData\Local\Temp\CUDA
