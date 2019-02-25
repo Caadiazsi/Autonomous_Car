@@ -44,7 +44,7 @@ def check_collide_distances(window, center, rot, color, coll_mult):
                 collide_distances[collide_mar] = temp
                 break
         if collide_states[collide_mar] == 1:
-            collide_distances[collide_mar] = 50
+            collide_distances[collide_mar] = 33
     return collide_states, collide_distances
 
 def draw_sensors(window, center, rot, collide_distances, collide_states, collide_multip, ccr, color1, color2):
@@ -83,11 +83,11 @@ def check_reward(old_distances, new_distances):
     old = old/3
     new = new/3
     if old > new:
-        return -800
+        return -70
     elif new > old:
+        return 80
+    else:g
         return 100
-    else:
-        return 200
 
 def main():
     py.init()
@@ -96,7 +96,7 @@ def main():
     temp = 0
     state = "TRAINING"
     final = False
-    iper = 5000
+    iper = 100
     #CAR SETTINGS
     INIT_X,INIT_Y,WIDTH,HEIGHT,vel,rot,rot_speed = 64,32,16,16,4,0,20
     #COLORS
@@ -185,15 +185,16 @@ def main():
         if collision:
             old_center = (INIT_X,INIT_Y)
             rot = 0
-            last_reward = -10000
+            last_reward = -100
             final = True
-            Network.recordar(collide_distances, action, last_reward, temp_collide_distances, final)
             if state == "TRAINING":
+                Network.recordar(collide_distances, action, last_reward, temp_collide_distances, final)
                 Network.aprender()
         else:
             last_reward = check_reward(collide_distances, temp_collide_distances)
             final = False
-            Network.recordar(collide_distances, action, last_reward, temp_collide_distances, final)
+            if state == "TRAINING":
+                Network.recordar(collide_distances, action, last_reward, temp_collide_distances, final)
         #UPDATE CAR (RECT)
         new_image = py.transform.rotate(image_car, rot)
         rect = new_image.get_rect()
