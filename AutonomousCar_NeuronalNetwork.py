@@ -31,15 +31,20 @@ def check_collide_distances(window, center, rot, color, coll_mult):
         while (temp<33):
             temp_X = int(center[0] + (temp * math.sin(temp_rot)))
             temp_Y = int(center[1] + (temp * math.cos(temp_rot)))
-            if(window.get_at((temp_X,temp_Y))) == color:
+            if temp_X>=0 and temp_X<= 736 and temp_Y>=0 and temp_Y<=736:
+                if(window.get_at((temp_X,temp_Y))) == color:
+                    collide_states[collide_mar] = 0
+                    collide_distances[collide_mar] = temp
+                    break
+                else:
+                    collide_states[collide_mar] = 1
+                    temp+=1
+            else:
                 collide_states[collide_mar] = 0
                 collide_distances[collide_mar] = temp
                 break
-            else:
-                collide_states[collide_mar] = 1
-                temp+=1
         if collide_states[collide_mar] == 1:
-            collide_distances[collide_mar] = 32
+            collide_distances[collide_mar] = 50
     return collide_states, collide_distances
 
 def draw_sensors(window, center, rot, collide_distances, collide_states, collide_multip, ccr, color1, color2):
@@ -68,21 +73,21 @@ def movement(center, vel, rot,rot_speed, action):
     new_center = (center[0] + (vel * math.sin(rot_radians)),center[1] + (vel * math.cos(rot_radians)))
     return new_center, rot
 
-def check_reward(old_sensors, new_sensors, old_distances, new_distances):
+def check_reward(old_distances, new_distances):
     ##MEJORAR: CUANDO SE MANTIENE DAR REWARD. DAR MAS REWARD AL ALEJARSE Y QUITAR MUCHO AL ACERCARSE
     old = 0
     new = 0
     for i in range (0,3):
-        if(old_sensors == 0):
-            old = old + old_distances[i]
-        if(new_sensors == 0):
-            old = old + new_distances[i]
+        old = old + old_distances[i]
+        new = new + new_distances[i]
+    old = old/3
+    new = new/3
     if old > new:
-        return -50
-    elif new < old:
+        return -800
+    elif new > old:
         return 100
     else:
-        return 50
+        return 200
 
 def main():
     py.init()
@@ -91,6 +96,7 @@ def main():
     temp = 0
     state = "TRAINING"
     final = False
+    iper = 5000
     #CAR SETTINGS
     INIT_X,INIT_Y,WIDTH,HEIGHT,vel,rot,rot_speed = 64,32,16,16,7,0,20
     #COLORS
@@ -140,10 +146,16 @@ def main():
         if keys[py.K_p]:
             epsilon = temp
             state = "TRAINING"
-        if(iterations%5000==0):
-            print("LETS GO!")
-            iterations = 1
-            epsilon = epsilon -0.1
+        if(state == "TRAINING"):
+            if(iterations%iper==0):
+                print("LETS GO!")
+                iterations = 0
+                if epsilon >= 0.2:
+                    epsilon = epsilon -0.1
+                    if epsilon < 0.2:
+                        state = "TESTING"
+                        epsilon = 0
+            iterations += 1
         CLOCK.tick(FPS)
         WIN.fill(BLACK)
 	    #COPY_CAR_POSITION
@@ -168,7 +180,7 @@ def main():
         temp_collide_sensors, temp_collide_distances = check_collide_distances(WIN, old_center, rot, PURPLE, COLL_MULTI)
         #DRAW_SENSORS
         draw_sensors(WIN, old_center, rot, collide_distances, collide_sensors, COLL_MULTI, COLLIDE_CIRCLES_RADIUS, RED, GREEN)
-        #CHECK COLLISION AND REWARD
+        #CHECK COLLISION AND REWARD --- UPDATE NETWORK
         collision = check_collision(collide_distances, collide_sensors)
         if collision:
             old_center = (INIT_X,INIT_Y)
@@ -179,7 +191,7 @@ def main():
             if state == "TRAINING":
                 Network.aprender()
         else:
-            last_reward = check_reward(collide_sensors, temp_collide_sensors, collide_distances, temp_collide_distances)
+            last_reward = check_reward(collide_distances, temp_collide_distances)
             final = False
             Network.recordar(collide_distances, action, last_reward, temp_collide_distances, final)
         #UPDATE CAR (RECT)
@@ -187,9 +199,9 @@ def main():
         rect = new_image.get_rect()
         rect.center = old_center
         WIN.blit(new_image,rect)
-        text_to_screen(WIN, epsilon, 750, 20)
-        text_to_screen(WIN, iterations, 750, 80)
-        text_to_screen(WIN, state, 750, 140)
+        text_to_screen(WIN, epsilon, 720, 20)
+        text_to_screen(WIN, iper-iterations, 720, 80)
+        text_to_screen(WIN, state, 720, 140)
 
         #CLOSE_WINDOW
         for event in py.event.get():
@@ -197,7 +209,6 @@ def main():
                 loop = False
         py.display.flip()
         py.display.update()
-        iterations += 1
     print("See You, Cruel World!")
     py.quit()
 
