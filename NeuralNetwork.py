@@ -11,12 +11,12 @@ class DeepQLearning():
     def __init__(self):
         self.memory = []
         self.red = self.RedNeural()
-        print(np.argmax(self.red.predict(np.array([[1, 1, 1]]))[0]))
+        print(np.argmax(self.red.predict(np.array([[1, 1, 1, 1, 1]]))[0]))
 
     def RedNeural(self):
         model = Sequential()
         # Input Layer de tamaño 4 (3 sensores), y dos capas ocultas
-        model.add(Dense(24, input_dim = 3, activation='relu'))
+        model.add(Dense(24, input_dim = 5, activation='relu'))
         model.add(Dense(24, activation='relu'))
         model.add(Dense(24, activation='relu'))
         layer = model.add(Dense(3, activation='linear'))
@@ -31,8 +31,8 @@ class DeepQLearning():
             #estados = []
             #targets = []
             for estado, accion, recompensa, siguienteEstado, final in self.memory:
-                siguienteEstado = np.array([[siguienteEstado[0], siguienteEstado[1], siguienteEstado[2]]])
-                estado = np.array([[estado[0], estado[1], estado[2]]])
+                siguienteEstado = np.array([[siguienteEstado[0], siguienteEstado[1], siguienteEstado[2],siguienteEstado[3],siguienteEstado[4]]])
+                estado = np.array([[estado[0], estado[1], estado[2],estado[3],estado[4]]])
                 target = recompensa
                 if not final:
                   target = recompensa + 0.9 * \
@@ -47,8 +47,8 @@ class DeepQLearning():
             #estados = []
             #targets = []
             for estado, accion, recompensa, siguienteEstado, final in minibatch:
-                siguienteEstado = np.array([[siguienteEstado[0], siguienteEstado[1], siguienteEstado[2]]])
-                estado = np.array([[estado[0], estado[1], estado[2]]])
+                siguienteEstado = np.array([[siguienteEstado[0], siguienteEstado[1], siguienteEstado[2],siguienteEstado[3],siguienteEstado[4]]])
+                estado = np.array([[estado[0], estado[1], estado[2],estado[3],estado[4]]])
                 target = recompensa
                 if not final:
                   target = recompensa + 0.9 * \
@@ -60,7 +60,7 @@ class DeepQLearning():
                 self.red.fit(estado, target_f, epochs=1, verbose=0)
 
     def actuar(self, state):
-        state = np.array([[state[0], state[1], state[2]]])
+        state = np.array([[state[0], state[1], state[2],state[3],state[4]]])
         act_values = self.red.predict(state)
         return np.argmax(act_values[0])  # returns action
 

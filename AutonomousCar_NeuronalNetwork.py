@@ -24,8 +24,8 @@ def draw_walls(window, tilesize, color, walls):
             py.draw.rect(window, color, py.Rect(wall[1]*tilesize,wall[2]*tilesize,wall[3]*tilesize, tilesize))
 
 def check_collide_distances(window, center, rot, color, coll_mult, sensor_distance):
-    collide_distances, collide_states = [0,0,0],[0,0,0]
-    for collide_mar in range(0,3):
+    collide_distances, collide_states = [0,0,0,0,0],[0,0,0,0,0]
+    for collide_mar in range(0,5):
         temp_rot = math.radians(rot+(coll_mult[collide_mar]))
         temp = 9
         while (temp<sensor_distance):
@@ -48,7 +48,7 @@ def check_collide_distances(window, center, rot, color, coll_mult, sensor_distan
     return collide_states, collide_distances
 
 def draw_sensors(window, center, rot, collide_distances, collide_states, collide_multip, ccr, color1, color2):
-    for i in range(0,3):
+    for i in range(0,5):
         temp_rot = math.radians(rot+(collide_multip[i]))
         temp_X = int(center[0] + (collide_distances[i] * math.sin(temp_rot)))
         temp_Y = int(center[1] + (collide_distances[i] * math.cos(temp_rot)))
@@ -58,7 +58,7 @@ def draw_sensors(window, center, rot, collide_distances, collide_states, collide
             py.draw.circle(window, color2, ( temp_X, temp_Y), ccr)
 
 def check_collision(collide_distances, collide_states):
-    for i in range(0,3):
+    for i in range(0,5):
         if collide_states[i]==0:
             if collide_distances[i]==9:
                 return True
@@ -77,7 +77,7 @@ def check_reward(old_distances, new_distances):
     ##MEJORAR: CUANDO SE MANTIENE DAR REWARD. DAR MAS REWARD AL ALEJARSE Y QUITAR MUCHO AL ACERCARSE
     old = 0
     new = 0
-    for i in range (0,3):
+    for i in range (0,5):
         old = old + old_distances[i]
         new = new + new_distances[i]
     old = old/3
@@ -103,11 +103,11 @@ def main():
     BLACK,LIGHTGREY,RED,GREEN,BLUE = (0,0,0),(100,100,100),(255,0,0),(0,255,0),(0,0,255)
     WHITE,PURPLE,LIGHTBLUE,LIGHTYELLOW = (255,255,255),(102,0,102),(153,255,255),(248,252,158)
     #COLLIDE_STUFF
-    collide_sensors = [1,1,1]
-    collide_distances = [48,48,48]
-    temp_collide_sensors = [1,1,1]
-    temp_collide_distances = [48,48,48]
-    COLL_MULTI = (45,0,-45)
+    collide_sensors = [1,1,1,1,1]
+    collide_distances = [sensor_distance,sensor_distance,sensor_distance,sensor_distance,sensor_distance]
+    temp_collide_sensors = [1,1,1,1,1]
+    temp_collide_distances = [sensor_distance,sensor_distance,sensor_distance,sensor_distance,sensor_distance]
+    COLL_MULTI = (90,45,0,-45,-90)
     COLLIDE_CIRCLES_RADIUS = 3
     #WINDOW SETTINGS
     WIN_WIDTH,WIN_HEIGHT,FPS,TILESIZE = 736,736,30,16
