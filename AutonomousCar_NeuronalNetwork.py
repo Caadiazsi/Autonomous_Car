@@ -86,7 +86,7 @@ def check_reward(old_distances, new_distances):
         return -70
     elif new > old:
         return 80
-    else:g
+    else:
         return 100
 
 def main():
