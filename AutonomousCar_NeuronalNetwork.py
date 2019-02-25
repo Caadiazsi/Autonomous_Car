@@ -91,14 +91,14 @@ def check_reward(old_distances, new_distances):
 
 def main():
     py.init()
-    print("WELCOME TO HOT WHEELS AI")
+    print("----------WELCOME TO HOT WHEELS AI----------")
     iterations = 1
     temp = 0
     state = "WAITING"
     final = False
-    iper = 100
+    iper = 200
     #CAR SETTINGS
-    INIT_X,INIT_Y,WIDTH,HEIGHT,vel,rot,rot_speed, sensor_distance = 64,32,16,16,6,0,20,33
+    INIT_X,INIT_Y,WIDTH,HEIGHT,vel,rot,rot_speed, sensor_distance = 64,32,16,16,6,0,20,45
     #COLORS
     BLACK,LIGHTGREY,RED,GREEN,BLUE = (0,0,0),(100,100,100),(255,0,0),(0,255,0),(0,0,255)
     WHITE,PURPLE,LIGHTBLUE,LIGHTYELLOW = (255,255,255),(102,0,102),(153,255,255),(248,252,158)
@@ -218,7 +218,7 @@ def main():
                 loop = False
         py.display.flip()
         py.display.update()
-    print("DRIVE SAFE!")
+    print("----------------DRIVE SAFE!!----------------")
     py.quit()
 
 if __name__ == '__main__':

@@ -27,7 +27,7 @@ class DeepQLearning():
         self.memory.append((estado, accion, recompensa, siguienteEstado, final))
 
     def aprender(self):
-        if len(self.memory) < 100:
+        if len(self.memory) < 200:
             #estados = []
             #targets = []
             for estado, accion, recompensa, siguienteEstado, final in self.memory:
@@ -43,7 +43,7 @@ class DeepQLearning():
                 #targets.append(target_f)
                 self.red.fit(estado, target_f, epochs=1, verbose=0)
         else:
-            minibatch = random.sample(self.memory, 100)
+            minibatch = random.sample(self.memory, 200)
             #estados = []
             #targets = []
             for estado, accion, recompensa, siguienteEstado, final in minibatch:
