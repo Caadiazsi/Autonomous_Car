@@ -97,11 +97,12 @@ def main():
     state = "WAITING"
     final = False
     iper = 200
+    map = 0
     #CAR SETTINGS
     INIT_X,INIT_Y,WIDTH,HEIGHT,vel,rot,rot_speed, sensor_distance, show_sensors = 64,32,16,16,6,0,20,45,True
     #COLORS
-    BLACK,LIGHTGREY,RED,GREEN,BLUE = (0,0,0),(100,100,100),(255,0,0),(0,255,0),(0,0,255)
-    WHITE,PURPLE,LIGHTBLUE,LIGHTYELLOW = (255,255,255),(102,0,102),(153,255,255),(248,252,158)
+    BLACK,LIGHTGREY,RED,GREEN,BLUE = (0,0,0),(100,100,100),(255,0,0),(0,255,0),(0,127,255)
+    WHITE,PURPLE,LIGHTBLUE,LIGHTYELLOW = (255,255,255),(255,127,0),(153,255,255),(248,252,158)
     #COLLIDE_STUFF
     collide_sensors = [1,1,1,1,1]
     collide_distances = [sensor_distance,sensor_distance,sensor_distance,sensor_distance,sensor_distance]
@@ -117,6 +118,7 @@ def main():
     GRIDWIDTH = WIN_WIDTH / TILESIZE
     GRIDHEIGHT = WIN_HEIGHT / TILESIZE
     #TRAINING CIRCUIT
+    # ,(,,,)
     TRAIN_WALLS = [(1,1,1,6),(0,1,1,6),(0,2,7,2),(0,3,9,4),(1,4,10,10),(1,14,9,2),(0,16,7,2),(1,17,6,5),(0,6,1,4),(1,7,5,5),(0,12,3,2),(0,13,1,2)
                   ,(1,14,1,11),(1,25,2,4),(0,27,3,6),(0,26,9,1),(1,24,10,2),(1,20,11,4),(0,19,12,2),(1,18,14,1),(1,7,15,11),(0,2,13,2)
                   ,(0,6,16,22),(0,1,15,26),(0,2,41,2),(0,3,43,1),(1,4,43,4),(0,8,42,2),(0,9,40,2),(0,10,21,19),(1,11,20,10),(0,21,18,2)
@@ -125,6 +127,19 @@ def main():
                   ,(0,18,41,2),(0,19,29,12),(1,20,28,9),(0,29,25,5),(1,30,24,10),(0,35,22,2),(1,36,21,4),(0,40,22,15),(0,44,18,23),(0,43,41,2)
                   ,(1,42,43,1),(1,38,43,4),(0,37,42,2),(0,36,40,2),(0,35,29,12),(0,34,40,2),(0,33,42,2),(1,29,43,4),(0,28,42,2),(0,27,33,9)
                   ,(0,31,25,12),(1,30,29,1),(0,26,42,2),(1,22,43,4),(1,21,43,1),(0,20,41,2),(0,23,29,10)]
+    TEST_WALLS_1 = [(0,1,7,30),(0,2,37,2),(1,3,39,2),(0,5,40,2),(1,6,42,32),(0,38,40,2),(1,39,39,2),(0,41,37,2),(0,42,7,30),(0,41,5,2),(1,39,4,2)
+                    ,(0,38,2,2),(1,6,1,32),(0,5,2,2),(1,3,4,2),(0,2,5,2),(0,5,11,22),(0,6,9,2),(1,7,8,2),(0,9,6,2),(1,10,5,24),(0,34,6,2),(1,35,8,2),(0,37,9,2)
+                    ,(0,38,11,22),(0,37,33,2),(1,35,35,2),(0,34,36,2),(1,10,38,24),(0,9,36,2),(1,7,35,2),(0,6,33,2)]
+    TEST_WALLS_2 = [(0,1,6,32),(0,2,38,1),(0,3,39,1),(0,4,40,1),(0,5,41,1),(1,6,42,32),(1,38,41,2),(0,40,36,5),
+                    (1,38,35,2),(0,37,34,1),(0,36,33,1),(0,35,32,1),(0,34,31,1),(0,28,31,1),(0,27,32,1),(0,26,33,1),(1,12,34,14),(0,11,33,1),
+                    (0,10,32,1),(0,9,31,1),(0,9,17,15),(0,10,16,1),(0,11,15,1),(0,12,14,1),(1,13,13,2),(0,15,14,1),(0,16,15,1),(0,17,16,1),
+                    (0,18,17,9),(0,19,26,1),(0,20,27,1),(0,21,28,1),(0,22,29,1),(1,23,30,15),(1,38,29,2),(0,40,24,5),
+                    (1,38,23,2),(1,35,22,3),(0,34,21,1),(0,33,20,1),(0,32,15,5),(1,33,14,2),(1,35,13,2),(0,37,11,2),(0,38,9,2),(0,39,8,1),
+                    (0,40,3,5),(1,38,2,2),(1,6,1,32),(0,5,2,1),(0,4,3,1),(0,3,4,1),(0,2,5,1),(0,6,13,1),(0,7,12,1),
+                    (0,8,11,1),(1,9,10,1),(1,10,9,8),(0,18,10,1),(0,19,11,1),(0,20,12,1),(0,21,13,1),(0,22,14,9),(0,23,23,1),(0,24,24,1),(0,25,25,1),(1,26,26,9),
+                    (1,31,25,2),(0,30,24,1),(0,29,23,1),(0,28,11,12),(0,29,10,1),(1,30,9,2),(1,32,8,2),(0,34,6,2),(1,9,5,25),(0,8,6,1),(0,7,7,1),(0,6,8,1),(0,5,9,26),
+                    (0,6,35,1),(0,7,36,1),(0,8,37,1),(1,9,38,27),(0,34,37,1),(0,33,36,1),(0,32,35,1),(0,31,34,1),(0,30,35,1),(0,29,36,1),(0,28,37,1)]
+    TEST_WALLS_3 = []
     # CAR "IMAGE"
     image_car = py.Surface((WIDTH,HEIGHT))
     image_car.set_colorkey(BLACK)
@@ -148,8 +163,23 @@ def main():
             state = "TESTING"
             epsilon = 0
         if state != "WAITING":
-            if state == "TESTING" and keys[py.K_g]:
-                Network.guardar()
+            if state == "TESTING" :
+                if keys[py.K_g]:
+                    Network.guardar()
+                if keys[py.K_0]:
+                    map = 0
+                    rect.center = (INIT_X,INIT_y)
+                    rot = 0
+                if keys[py.K_1]:
+                    map = 1
+                    rect.center = (320,50)
+                    rot = 90
+                if keys[py.K_2]:
+                    map = 2
+                    rect.center = (288,645)
+                    rot = 90
+                if keys[py.K_3]:
+                    map = 3
             if keys[py.K_t]:  #TEST
                 temp = epsilon
                 epsilon = 0
@@ -173,7 +203,17 @@ def main():
             #DRAW_GRID
             #draw_grid(WIN, WIN_WIDTH,WIN_HEIGHT,TILESIZE,LIGHTGREY)
             #DRAW_WALLS
-            draw_walls(WIN,TILESIZE, PURPLE, TRAIN_WALLS)
+            if(state == "TRAINING"):
+                draw_walls(WIN,TILESIZE, PURPLE, TRAIN_WALLS)
+            else:
+                if map == 0:
+                    draw_walls(WIN,TILESIZE, PURPLE, TRAIN_WALLS)
+                elif map == 1:
+                    draw_walls(WIN,TILESIZE, PURPLE, TEST_WALLS_1)
+                elif map == 2:
+                    draw_walls(WIN,TILESIZE, PURPLE, TEST_WALLS_2)
+                elif map == 3:
+                    draw_walls(WIN,TILESIZE, PURPLE, TEST_WALLS_3)
             #THE_OBJECTIVE
             #py.draw.rect(WIN, LIGHTYELLOW, py.Rect(20*TILESIZE,29*TILESIZE,TILESIZE*3,TILESIZE*3))
             #CHECK_COLIDE_MARKERS
@@ -211,9 +251,11 @@ def main():
             rect = new_image.get_rect()
             rect.center = old_center
             WIN.blit(new_image,rect)
-        text_to_screen(WIN, epsilon, 720, 20)
-        text_to_screen(WIN, iper-iterations, 720, 80)
-        text_to_screen(WIN, state, 720, 140)
+        text_to_screen(WIN, "EPSILON", 736, 20)
+        text_to_screen(WIN, epsilon, 736, 50)
+        text_to_screen(WIN, "ITERATION", 736, 80)
+        text_to_screen(WIN, iper-iterations, 736, 110)
+        text_to_screen(WIN, state, 736, 160)
 
         #CLOSE_WINDOW
         for event in py.event.get():

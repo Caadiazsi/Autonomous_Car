@@ -1,6 +1,6 @@
 import pygame
 
-def text_to_screen(screen, text, x, y, size = 25, color = (255, 255, 255), font_type = 'ARCADE.ttf'):
+def text_to_screen(screen, text, x, y, size = 20, color = (255, 255, 255), font_type = 'ARCADE.ttf'):
     try:
         text = str(text)
         font = pygame.font.Font(font_type, size)
